@@ -33,6 +33,32 @@ function loadData() {
     var streetviewUrl = 'http://maps.googleapis.com/maps/api/streetview?size=600x400&location=' + address + '';
     $body.append('<img class="bgimg" src="' + streetviewUrl + '">');
 
+
+    var nytUrl = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
+    nytUrl += '?' + $.param({
+        'api-key': "24075f2187a74e17a942c059b8b6ba11",
+        'q': cityStr
+    });
+
+    $.getJSON( nytUrl, function( data ) {
+        $nytHeaderElem.text('New York Times Articles About ' + cityStr);
+
+        var items = [];
+        $.each( data.response.docs, function( key, val ) {
+            items.push( "<li class='article' id='" + key + "'><a href='" + 
+                val.web_url + "'>" + val.headline.main + "</a><p>" + 
+                val.snippet + "</p></li>" );
+        });
+
+        $( "<ul/>", {
+            "id": "nytimes-articles",
+            html: items.join( "" )
+        }).appendTo( "body" );
+    })
+    .fail(function( error ) {
+        $nytHeaderElem.text('New York Times Articles Could Not Be Loaded');
+    });
+
     return false;
 };
 
